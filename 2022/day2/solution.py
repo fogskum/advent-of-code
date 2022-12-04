@@ -18,6 +18,18 @@ my_map = {
     "Z": Shape.Scissor
 }
 
+win_map = { 
+    Shape.Rock: Shape.Paper,
+    Shape.Paper: Shape.Scissor,
+    Shape.Scissor: Shape.Rock
+}
+
+lose_map = { 
+    Shape.Rock: Shape.Scissor,
+    Shape.Paper: Shape.Rock,
+    Shape.Scissor: Shape.Paper
+}
+
 def calc_score(opponent_shape, my_shape) -> int:
     win = 6
     draw = 3
@@ -55,12 +67,27 @@ def part1(input_values):
         
     print( "My total score: " + str(my_score) )
 
+def part2(input_values):
+    my_score = 0
+    for round in input_values:
+        opponent_shape = opponent_map[round.split(" ")[0]]
+        my_outcome = my_map[round.split(" ")[1]]
+        if my_outcome == "X": # I need to lose
+            my_score += calc_score(opponent_shape, lose_map[opponent_shape])
+        elif my_outcome == "Y":
+            my_score += calc_score(opponent_shape, opponent_shape)
+        else:
+            my_score += calc_score(opponent_shape, win_map[opponent_shape])
+    
+    print(my_score)
+
+
 def get_input() -> list[str]:
     with open("input.txt", "r") as f:
         list = f.read().split("\n")
         return list
 
 if __name__ == "__main__":
-    # part 1
     input_values = get_input()
     part1(input_values)
+    part2(input_values)
