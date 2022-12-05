@@ -71,12 +71,14 @@ def part2(input_values):
     my_score = 0
     for round in input_values:
         opponent_shape = opponent_map[round.split(" ")[0]]
-        my_outcome = my_map[round.split(" ")[1]]
+        my_outcome = round.split(" ")[1]
         if my_outcome == "X": # I need to lose
             my_score += calc_score(opponent_shape, lose_map[opponent_shape])
         elif my_outcome == "Y":
+            # need to be a draw, use the same shape as my opponent
             my_score += calc_score(opponent_shape, opponent_shape)
         else:
+            # I need to win
             my_score += calc_score(opponent_shape, win_map[opponent_shape])
     
     print(my_score)
