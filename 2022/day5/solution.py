@@ -12,7 +12,7 @@ class Instruction:
 
 def get_message(all_stacks):
     # return the first crate id in each stack
-    return [stack[0] for stack in all_stacks.values()]
+    return "".join([stack[0] for stack in all_stacks.values()])
 
 def get_stacks(input_values, stack_count):
     current_idx = 0
@@ -48,24 +48,23 @@ def apply_instructions(instructions, stacks):
         #  find stack to move from
         stack_from = stacks[instruction.FromStackId]
         stack_to = stacks[instruction.ToStackId]
-        for idx in range(0, instruction.Quantity):
-            stack_to.insert(0, stack_from[idx])
-            stack_from.remove(idx)
+        # move crates
+        [stack_to.insert(0, stack_from.pop(0)) for n in range(0, instruction.Quantity)]
 
 def part1(input_values, stack_count):
     stacks = get_stacks(input_values, stack_count)
     instructions = get_instructions(input_values)
     apply_instructions(instructions, stacks)
-    msg = get_message(stacks)
-
-    return msg
+    return get_message(stacks)
 
 def get_input(filename):
     with open(filename, "r") as f:
         return f.readlines()
 
 if __name__ == "__main__":
-    input_values = get_input("sample_input.txt")
+    input_values = get_input("input.txt")
     
-    part1_result = part1(input_values, 3)
-    print(part1_result)
+    #part1_expected = "CMZ"
+    part1_expected = "FWNSHLDNZ"
+    part1_result = part1(input_values, 9)
+    assert part1_expected == part1_result
