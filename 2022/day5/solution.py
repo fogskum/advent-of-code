@@ -43,7 +43,7 @@ def get_instructions(input_values):
 
     return instructions
 
-def apply_instructions(instructions, stacks):
+def apply_instructions_part1(instructions, stacks):
     for instruction in instructions:
         #  find stack to move from
         stack_from = stacks[instruction.FromStackId]
@@ -51,11 +51,27 @@ def apply_instructions(instructions, stacks):
         # move crates
         [stack_to.insert(0, stack_from.pop(0)) for n in range(0, instruction.Quantity)]
 
-def part1(input_values, stack_count):
+def apply_instructions_part2(instructions, stacks):
+    for instruction in instructions:
+        #  find stack to move from
+        stack_from = stacks[instruction.FromStackId]
+        stack_to = stacks[instruction.ToStackId]
+        # move crates but stay in the same order
+        slice_to_move = stack_from[0:instruction.Quantity]
+        [stack_from.pop(0) for n in range(0, instruction.Quantity)]
+        # insert slice first in list
+        slice_to_move.reverse()
+        [stack_to.insert(0, crate) for crate in slice_to_move]
+
+def part1(instructions, stack_count):
     stacks = get_stacks(input_values, stack_count)
-    instructions = get_instructions(input_values)
-    apply_instructions(instructions, stacks)
+    apply_instructions_part1(instructions, stacks)
     return get_message(stacks)
+
+def part2(instructions, stack_count):
+    stacks = get_stacks(input_values, stack_count)
+    apply_instructions_part2(instructions, stacks)
+    return get_message(stacks)    
 
 def get_input(filename):
     with open(filename, "r") as f:
@@ -63,8 +79,15 @@ def get_input(filename):
 
 if __name__ == "__main__":
     input_values = get_input("input.txt")
+    stack_count = 9
+    stacks = get_stacks(input_values, stack_count)
+    instructions = get_instructions(input_values)
     
     #part1_expected = "CMZ"
     part1_expected = "FWNSHLDNZ"
-    part1_result = part1(input_values, 9)
-    assert part1_expected == part1_result
+    part1_result = part1(instructions, stack_count)
+    assert part1_result == part1_expected
+
+    part2_expected = "RNRGDNFQG"
+    part2_result = part2(instructions, stack_count)
+    assert part2_result == part2_expected
