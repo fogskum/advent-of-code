@@ -1,35 +1,27 @@
 from pathlib import Path
 
 class Instruction:
+    def __init__(self, qty, from_stack_id, to_stack_id):
+        self.Quantity = qty
+        self.FromStackId = from_stack_id
+        self.ToStackId = to_stack_id
+
     Quantity = 0
-    FromCrate = 0
-    ToCrate = 0
-
-def get_stack_count(input_values):
-    line_num = 0
-    for line in input_values:
-        if line == "\n":
-            break
-        line_num += 1
-
-    print(line_num)
-    numbers = input_values[line_num-1].strip().split("   ")
-    print(numbers)
+    FromStackId = 0
+    ToStackId = 0
 
 def get_message(all_stacks):
+    # return the first crate id in each stack
     return [stack[0] for stack in all_stacks.values()]
 
-def get_stacks(input_values, crate_count):
-    line_num = 0
+def get_stacks(input_values, stack_count):
     current_idx = 0
+    # get all lines with crates
+    crate_lines = [line for line in input_values if "[" in line]
     # init stacks with empty stack
-    all_stacks = {i: [] for i in range(1, crate_count+1)}
-    for line in input_values:
-        if line == "\n":
-            break
-        line_num += 1
-        
-        for crate_idx in range(1, crate_count + 1):
+    all_stacks = {i: [] for i in range(1, stack_count+1)}
+    for line in crate_lines:
+        for crate_idx in range(1, stack_count + 1):
             # crate id found on every 4th char
             current_idx = crate_idx * 4 - 3
             crate_id = line[current_idx]
@@ -37,8 +29,36 @@ def get_stacks(input_values, crate_count):
                 # create found
                 local_crates = all_stacks[crate_idx]
                 local_crates.append(crate_id)
-    
+
     return all_stacks
+
+def get_instructions(input_values):
+    # get lines with instructions
+    lines = [line for line in input_values if "move" in line]
+    instructions = []
+    for line in lines:
+        line_parts = line.split(' ')
+        instruction = Instruction(int(line_parts[1]), int(line_parts[3]), int(line_parts[5]))
+        instructions.append(instruction)
+
+    return instructions
+
+def apply_instructions(instructions, stacks):
+    for instruction in instructions:
+        #  find stack to move from
+        stack_from = stacks[instruction.FromStackId]
+        stack_to = stacks[instruction.ToStackId]
+        for idx in range(0, instruction.Quantity):
+            stack_to.insert(0, stack_from[idx])
+            stack_from.remove(idx)
+
+def part1(input_values, stack_count):
+    stacks = get_stacks(input_values, stack_count)
+    instructions = get_instructions(input_values)
+    apply_instructions(instructions, stacks)
+    msg = get_message(stacks)
+
+    return msg
 
 def get_input(filename):
     with open(filename, "r") as f:
@@ -46,7 +66,6 @@ def get_input(filename):
 
 if __name__ == "__main__":
     input_values = get_input("sample_input.txt")
-    stacks = get_stacks(input_values, 3)
-    msg = get_message(stacks)
-    print(msg)
     
+    part1_result = part1(input_values, 3)
+    print(part1_result)
