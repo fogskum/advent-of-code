@@ -13,9 +13,9 @@ class Folder(object):
         self.name = name
         self.subfolders = []
         self.files = []
+
         if subfolders is not None:
-            for subfolder in subfolders:
-                self.AddSubFolder(subfolder)
+            [self.AddSubFolder(subfolder) for subfolder in subfolders]
 
     def __repr__(self) -> str:
         return self.name
@@ -86,8 +86,7 @@ def build_tree(input_values):
 
 def sum_tree(folder, sizes):
     sizes.append( folder.GetSize() )
-    for sub_folder in folder.GetSubFolders():
-        sum_tree(sub_folder, sizes)
+    [sum_tree(sub_folder, sizes) for sub_folder in folder.GetSubFolders()]
 
 def part1(input_values):
     tree = build_tree( input_values)
