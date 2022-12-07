@@ -26,6 +26,14 @@ class Node(object):
                 return node
         return None
 
+    def get_sum(self):
+        sum = 0
+        for child_node in self.children:
+            if child_node.size == 0:
+                sum += child_node.get_sum()
+            sum += child_node.size
+        return sum
+
 def parse_command(line):
     cmd_segments = line[2:].split(' ')
     cmd = cmd_segments[0]
@@ -66,9 +74,22 @@ def build_tree(input_values):
                 current_node.add_child(Node(dir_name))
     return tree
 
+def sum_tree(node, sizes):
+    sizes.append( node.get_sum() )
+    for child_node in node.children:
+        sum_tree(child_node, sizes)
+
 def part1(input_values):
-    tree = build_tree(input_values)
-    return 0
+    tree = build_tree( input_values)
+    sizes = []
+    sum_tree( tree, sizes )
+    
+    sum = 0
+    for size in sizes:
+        if size <= 100000:
+            sum += size
+    
+    return sum
 
 def get_input(filename):
     with open(filename, "r") as f:
@@ -77,3 +98,4 @@ def get_input(filename):
 if __name__ == "__main__":
     input_values = get_input("sample_input.txt")
     part1_result = part1(input_values)
+    print(part1_result)
