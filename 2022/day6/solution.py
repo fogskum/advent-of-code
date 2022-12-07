@@ -1,32 +1,26 @@
 from pathlib import Path
 from collections import Counter
 
-def get_start_pos(input_values, window_size):
-    start_idx = 0
-    while True:
-        end_idx = start_idx + window_size
-        seq = input_values[start_idx:end_idx]
-        if is_marker(seq):
-            return end_idx
-        
-        start_idx += window_size - 1
-
-def is_marker(seq):
-    string = Counter(seq)
-    for char, count in string.items():
-        if(count > 1):
-            return False
-    return True
+def get_marker_pos(input_values, window_size):
+    start = window_size-1
+    end = len(input_values)-(window_size-1)
+    for i in range(start, end):
+        marker = input_values[i-window_size:i]
+        # check character frequency in marker
+        freq = Counter(marker)
+        # if the frequency size = window_size, marker is unique
+        if len(freq) == window_size:
+            return i
 
 def part1(input_values):
-    return get_start_pos(input_values, 4)
+    return get_marker_pos(input_values, 4)
 
 def part2(input_values):
-    return get_start_pos(input_values, 14) - 1
+    return get_marker_pos(input_values, 14)
 
 def get_input(filename):
     with open(filename, "r") as f:
-        return f.readline()
+        return f.readline().strip()
 
 if __name__ == "__main__":
     input_values = get_input("input.txt")
