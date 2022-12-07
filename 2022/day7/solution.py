@@ -1,9 +1,11 @@
 from pathlib import Path
 
-class Tree(object):
+class Node(object):
     "Generic tree node"
-    def __init__(self, name="/", children=None):
+    def __init__(self, name = "/", size = 0, children = None):
+        self.parent = None
         self.name = name
+        self.size = size
         self.children = []
         if children is not None:
             for child in children:
@@ -13,8 +15,16 @@ class Tree(object):
         return self.name
 
     def add_child(self, node):
-        assert isinstance(node, Tree)
+        assert isinstance(node, Node)
+        # set parent to this instance for new node
+        node.parent = self
         self.children.append(node)
+
+    def find_node(self, name):
+        for node in self.children:
+            if node.name == name:
+                return node
+        return None
 
 def parse_command(line):
     cmd_segments = line[2:].split(' ')
@@ -25,23 +35,23 @@ def parse_command(line):
     return (cmd, arg)
 
 def build_tree(input_values):
-    tree = Tree()
-    current_path = ""
+    tree = Node("/")
+    current_node = tree
     for line in input_values:
         if line[0] == '$':
             # command
             cmd = parse_command(line)
             process = cmd[0]
-            cmd_arg = cmd[1]
+            process_arg = cmd[1]
             if process == "cd":
-                if cmd_arg == "..":
+                if process_arg == "..":
                     # move to parent
-                    print("")
+                    current_node = current_node.parent
                 else:
-
-                    current_path += cmd[1]
-                    if current_path != "/":
-                        current_path += "/"
+                    if process_arg != "/": # skip root as this has already been added
+                        # switch directory
+                        dir_name = process_arg
+                        current_node = current_node.find_node(dir_name)
         else:
             # dir listing
             contents = line.split(' ')
@@ -49,7 +59,12 @@ def build_tree(input_values):
                 # file
                 file_size = int(contents[0])
                 file_name = contents[1]
-                file_path = "{}{}".format(current_path, file_name)
+                current_node.add_child(Node(file_name, file_size))
+            else:
+                # dir
+                dir_name = contents[1]
+                current_node.add_child(Node(dir_name))
+    return tree
 
 def part1(input_values):
     tree = build_tree(input_values)
