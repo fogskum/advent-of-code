@@ -6,12 +6,11 @@ class File(object):
         self.name = name
         self.size = size
 
-class Node(object):
-    "Generic tree node"
-    def __init__(self, name = "/", size = 0, subfolders = None):
+class Folder(object):
+    "Represents a folder"
+    def __init__(self, name = "/", subfolders = None):
         self.parent = None
         self.name = name
-        self.size = size
         self.subfolders = []
         self.files = []
         if subfolders is not None:
@@ -21,8 +20,14 @@ class Node(object):
     def __repr__(self) -> str:
         return self.name
 
+    def AddFile(self, file):
+        self.files.append(file)
+
+    def GetSubFolders(self):
+        return self.subfolders
+
     def AddSubFolder(self, node):
-        assert isinstance(node, Node)
+        assert isinstance(node, Folder)
         # set parent to this instance for new node
         node.parent = self
         self.subfolders.append(node)
@@ -34,12 +39,10 @@ class Node(object):
         return None
 
     def GetSize(self):
-        sum = 0
+        temp_sum = sum([file.size for file in self.files])
         for child_node in self.subfolders:
-            if child_node.size == 0:
-                sum += child_node.get_sum()
-            sum += child_node.size
-        return sum
+            temp_sum += child_node.GetSize()
+        return temp_sum
 
 def parse_command(line):
     cmd_segments = line[2:].split(' ')
@@ -50,7 +53,7 @@ def parse_command(line):
     return (cmd, arg)
 
 def build_tree(input_values):
-    tree = Node("/")
+    tree = Folder("/")
     current_node = tree
     for line in input_values:
         if line[0] == '$':
@@ -74,35 +77,32 @@ def build_tree(input_values):
                 # file
                 file_size = int(contents[0])
                 file_name = contents[1]
-                current_node.AddSubFolder(Node(file_name, file_size))
+                current_node.AddFile(File(file_name, file_size))
             else:
                 # dir
                 dir_name = contents[1]
-                current_node.AddSubFolder(Node(dir_name))
+                current_node.AddSubFolder(Folder(dir_name))
     return tree
 
-def sum_tree(node, sizes):
-    sizes.append( node.get_sum() )
-    for child_node in node.children:
-        sum_tree(child_node, sizes)
+def sum_tree(folder, sizes):
+    sizes.append( folder.GetSize() )
+    for sub_folder in folder.GetSubFolders():
+        sum_tree(sub_folder, sizes)
 
 def part1(input_values):
     tree = build_tree( input_values)
     sizes = []
     sum_tree( tree, sizes )
     
-    sum = 0
-    for size in sizes:
-        if size <= 100000:
-            sum += size
-    
-    return sum
+    return sum([size for size in sizes if size <= 100000])
 
 def get_input(filename):
     with open(filename, "r") as f:
         return f.read().split("\n")
 
 if __name__ == "__main__":
-    input_values = get_input("sample_input.txt")
+    input_values = get_input("input.txt")
+    
     part1_result = part1(input_values)
-    print(part1_result)
+    part1_expected = 1423358
+    assert part1_expected == part1_expected
