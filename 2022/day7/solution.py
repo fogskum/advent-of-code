@@ -1,34 +1,41 @@
 from pathlib import Path
 
+class File(object):
+    "Represents a file"
+    def __init__(self, name, size):
+        self.name = name
+        self.size = size
+
 class Node(object):
     "Generic tree node"
-    def __init__(self, name = "/", size = 0, children = None):
+    def __init__(self, name = "/", size = 0, subfolders = None):
         self.parent = None
         self.name = name
         self.size = size
-        self.children = []
-        if children is not None:
-            for child in children:
-                self.add_child(child)
+        self.subfolders = []
+        self.files = []
+        if subfolders is not None:
+            for subfolder in subfolders:
+                self.AddSubFolder(subfolder)
 
     def __repr__(self) -> str:
         return self.name
 
-    def add_child(self, node):
+    def AddSubFolder(self, node):
         assert isinstance(node, Node)
         # set parent to this instance for new node
         node.parent = self
-        self.children.append(node)
+        self.subfolders.append(node)
 
-    def find_node(self, name):
-        for node in self.children:
+    def FindFolder(self, name):
+        for node in self.subfolders:
             if node.name == name:
                 return node
         return None
 
-    def get_sum(self):
+    def GetSize(self):
         sum = 0
-        for child_node in self.children:
+        for child_node in self.subfolders:
             if child_node.size == 0:
                 sum += child_node.get_sum()
             sum += child_node.size
@@ -59,7 +66,7 @@ def build_tree(input_values):
                     if process_arg != "/": # skip root as this has already been added
                         # switch directory
                         dir_name = process_arg
-                        current_node = current_node.find_node(dir_name)
+                        current_node = current_node.FindFolder(dir_name)
         else:
             # dir listing
             contents = line.split(' ')
@@ -67,11 +74,11 @@ def build_tree(input_values):
                 # file
                 file_size = int(contents[0])
                 file_name = contents[1]
-                current_node.add_child(Node(file_name, file_size))
+                current_node.AddSubFolder(Node(file_name, file_size))
             else:
                 # dir
                 dir_name = contents[1]
-                current_node.add_child(Node(dir_name))
+                current_node.AddSubFolder(Node(dir_name))
     return tree
 
 def sum_tree(node, sizes):
