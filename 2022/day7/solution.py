@@ -88,12 +88,23 @@ def sum_tree(folder, sizes):
     sizes.append( folder.GetSize() )
     [sum_tree(sub_folder, sizes) for sub_folder in folder.GetSubFolders()]
 
-def part1(input_values):
-    tree = build_tree( input_values)
+def part1(tree):
     sizes = []
     sum_tree( tree, sizes )
     
     return sum([size for size in sizes if size <= 100000])
+
+def part2(tree):
+    sizes = []
+    sum_tree( tree, sizes )
+    total_disk_space = 70000000
+    required = 30000000
+    sorted_sizes = sorted(sizes)
+    used_space = sorted_sizes[-1]
+    unused_space = total_disk_space - used_space
+    missing_space = required - unused_space
+    
+    return [size for size in sorted_sizes if size > missing_space][0]
 
 def get_input(filename):
     with open(filename, "r") as f:
@@ -101,7 +112,14 @@ def get_input(filename):
 
 if __name__ == "__main__":
     input_values = get_input("input.txt")
+    tree = build_tree( input_values )
     
-    part1_result = part1(input_values)
+    part1_result = part1(tree)
     part1_expected = 1423358
+    #part1_expected = 95437
     assert part1_expected == part1_expected
+
+    part2_result = part2(tree)
+    part2_expected = 545729
+    #part2_expected = 24933642
+    assert part2_result == part2_expected
