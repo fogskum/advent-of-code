@@ -18,54 +18,66 @@ def is_edge(matrix, row, col):
         return True
     return False
 
-def get_vertical_heights(matrix, col):
+def get_top_heights(matrix, row, col):
     heights = []
-    for row in range(0, len(matrix)):
+    for row in range(0, row):
         height = matrix[row][col]
         heights.append(height)
     return heights
 
-def get_heights_greater_than(heights, height):
+def get_bottom_heights(matrix, start_row, col):
+    heights = []
+    for row in range(start_row+1, len(matrix)):
+        height = matrix[row][col]
+        heights.append(height)
+    return heights    
+
+def get_trees_lower_than(heights, height):
     return [h for h in heights if h >= height]
 
-def tree_at_pos_visible(matrix, row, col, tree_height):
+def visible_trees_at_pos(matrix, row, col, tree_height):
     if is_edge(matrix, row, col):
         return True
 
-    count = 0
     # right side
     heights = matrix[row][:col]
-    if len(get_heights_greater_than(heights, tree_height)) == 0:
-        count += 1
+    if len(get_trees_lower_than(heights, tree_height)) == 0:
+        return True
     
     # left side
     heights = matrix[row][col+1:]
-    if len(get_heights_greater_than(heights, tree_height)) == 0:
-        count += 1
+    if len(get_trees_lower_than(heights, tree_height)) == 0:
+        return True
     
-    # top size
-    heights = get_vertical_heights(matrix, col)
-    if len(get_heights_greater_than(heights, tree_height)) == 0:
-        count += 1
+    # top side
+    heights = get_top_heights(matrix, row, col)
+    if len(get_trees_lower_than(heights, tree_height)) == 0:
+        return True
+
+    # bottom side
+    heights = get_bottom_heights(matrix, row, col)
+    if len(get_trees_lower_than(heights, tree_height)) == 0:
+        return True
 
     return False
 
 def part1(matrix):
-    visible_count = 0
+    count = 0
     row = 0
     for i in matrix:
         col = 0
         for tree_height in i:
-            #tree_height = matrix[row][col]
-            if tree_at_pos_visible(matrix, row, col, tree_height):
-                visible_count += 1
+            if visible_trees_at_pos(matrix, row, col, tree_height):
+                count += 1
             col += 1
         row += 1
 
-    return visible_count
+    return count
 
 if __name__ == "__main__":
-    input_values = get_input("sample_input.txt")
+    input_values = get_input("input.txt")
     matrix = get_matrix(input_values)
+    
     part1_result = part1(matrix)
-    print(part1_result)
+    part1_expected = 1662
+    assert part1_result == part1_expected
