@@ -97,12 +97,8 @@ def part1(tree):
 def part2(tree):
     sizes = []
     sum_tree( tree, sizes )
-    total_disk_space = 70000000
-    required = 30000000
     sorted_sizes = sorted(sizes)
-    used_space = sorted_sizes[-1]
-    unused_space = total_disk_space - used_space
-    missing_space = required - unused_space
+    missing_space = 30000000 - (70000000 - sorted(sizes)[-1])
     
     return [size for size in sorted_sizes if size > missing_space][0]
 
