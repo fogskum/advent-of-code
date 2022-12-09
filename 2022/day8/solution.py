@@ -11,7 +11,7 @@ def get_matrix(input_values):
         # create list of tree heights
         rows = [int(char) for char in line]
         matrix.append(rows)
-    return matrix
+    return np.array(matrix)
 
 def is_edge(matrix, row, col):
     # we assume the matrix is NxN
@@ -19,20 +19,6 @@ def is_edge(matrix, row, col):
     if row == 0 or col == 0 or (row == max - 1) or (col == max - 1):
         return True
     return False
-
-def get_top_heights(matrix, row, col):
-    heights = []
-    for row in range(0, row):
-        height = matrix[row][col]
-        heights.append(height)
-    return heights 
-
-def get_bottom_heights(matrix, start_row, col):
-    heights = []
-    for row in range(start_row+1, len(matrix)):
-        height = matrix[row][col]
-        heights.append(height)
-    return heights    
 
 def get_trees_lower_than(heights, height):
     return [h for h in heights if h >= height]
@@ -42,30 +28,21 @@ def is_visible(heights, height):
         return True
     return False
 
-def is_tree_visible_at_pos(matrix, row, col, height):
+def is_tree_visible_at_pos(matrix, row, col):
     if is_edge(matrix, row, col):
         return True
 
-    # right side
-    heights = matrix[row][:col]
-    if is_visible(heights, height):
-        return True
-    
-    # left side
-    heights = matrix[row][col+1:]
-    if is_visible(heights, height):
-        return True
-    
-    # top side
-    heights = get_top_heights(matrix, row, col)
-    if is_visible(heights, height):
-        return True
+    height = matrix[row][col]
+    ranges = [ 
+        matrix[:row, col],      # top
+        matrix[row+1:, col],    # bottom
+        matrix[row, col+1:],    # right
+        matrix[row, :col]       # left
+    ]
 
-    # bottom side
-    heights = get_bottom_heights(matrix, row, col)
-    if is_visible(heights, height):
-        return True
-
+    for range in ranges:
+        if is_visible(range, height):
+            return True
     return False
 
 def record_num_visible_trees(array, height, nums):
@@ -79,14 +56,13 @@ def record_num_visible_trees(array, height, nums):
         nums.append(count)
 
 def get_scenic_score(matrix, row, col):
-    m = np.array(matrix)
-    height = m[row][col]
+    height = matrix[row][col]
     nums = []
     ranges = [ 
-        m[:row, col][::-1], # up (reversed)
-        m[row+1:, col],     # down
-        m[row, col+1:],     # right
-        m[row, :col][::-1]  # left (revered)
+        matrix[:row, col][::-1], # up (reversed)
+        matrix[row+1:, col],     # down
+        matrix[row, col+1:],     # right
+        matrix[row, :col][::-1]  # left (revered)
     ]
     [record_num_visible_trees(range, height, nums) for range in ranges]
     # calculate the score by multiplying all numbers
@@ -94,14 +70,10 @@ def get_scenic_score(matrix, row, col):
 
 def part1(matrix):
     count = 0
-    row = 0
-    for i in matrix:
-        col = 0
-        for tree_height in i:
-            if is_tree_visible_at_pos(matrix, row, col, tree_height):
+    for i in range(0, len(matrix)):
+        for j in range(0, len(matrix)):
+            if is_tree_visible_at_pos(matrix, i, j):
                 count += 1
-            col += 1
-        row += 1
     return count
 
 def part2(matrix):
