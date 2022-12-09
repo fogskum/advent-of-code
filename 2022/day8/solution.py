@@ -62,7 +62,7 @@ def get_scenic_score(matrix, row, col):
         matrix[:row, col][::-1], # up (reversed)
         matrix[row+1:, col],     # down
         matrix[row, col+1:],     # right
-        matrix[row, :col][::-1]  # left (revered)
+        matrix[row, :col][::-1]  # left (reversed)
     ]
     [record_num_visible_trees(range, height, nums) for range in ranges]
     # calculate the score by multiplying all numbers
