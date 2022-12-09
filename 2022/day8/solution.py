@@ -1,5 +1,5 @@
 from pathlib import Path
-import numpy
+import numpy as np
 
 def get_input(filename):
     with open(filename, "r") as f:
@@ -25,15 +25,7 @@ def get_top_heights(matrix, row, col):
     for row in range(0, row):
         height = matrix[row][col]
         heights.append(height)
-    return heights
-
-def get_top_heights_lower_than(matrix, row, col, limit):
-    heights = []
-    for row in range(0, row):
-        height = matrix[row][col]
-        if height <= limit:
-            heights.append(height)
-    return heights    
+    return heights 
 
 def get_bottom_heights(matrix, start_row, col):
     heights = []
@@ -76,12 +68,29 @@ def is_tree_visible_at_pos(matrix, row, col, height):
 
     return False
 
-def get_scenic_score(matrix, row, col):
-    height = matrix[row][col]
+def record_num_visible_trees(array, height, nums):
+    count = 0
+    for value in array:
+        count += 1
+        if value >= height:
+            break
+    
+    if count > 0:
+        nums.append(count)
 
-    score = 0    
-    heights = get_top_heights_lower_than(matrix, row, col, height)
-    return 0
+def get_scenic_score(matrix, row, col):
+    m = np.array(matrix)
+    height = m[row][col]
+    nums = []
+    ranges = [ 
+        m[:row, col][::-1], # up (reversed)
+        m[row+1:, col],     # down
+        m[row, col+1:],     # right
+        m[row, :col][::-1]  # left (revered)
+    ]
+    [record_num_visible_trees(range, height, nums) for range in ranges]
+    # calculate the score by multiplying all numbers
+    return np.prod(nums).item()
 
 def part1(matrix):
     count = 0
@@ -96,25 +105,24 @@ def part1(matrix):
     return count
 
 def part2(matrix):
-    row = 0
-    scores = []
-    for i in range(1, len(matrix)-1):
-        col = 0
-        for tree_height in i:
-            scores.append(get_scenic_score(matrix, row, col))
-            col += 1
-        row += 1
-    return numpy.prod(scores)
+    max_score = 0
+    maxlen = len(matrix)-1
+    for i in range(1, maxlen):
+        for j in range(1, maxlen):
+            score = get_scenic_score(matrix, i, j)
+            max_score = score if score > max_score else max_score
+    return max_score
 
 if __name__ == "__main__":
-    input_values = get_input("sample_input.txt")
+    input_values = get_input("input.txt")
     matrix = get_matrix(input_values)
     
     part1_result = part1(matrix)
-    #part1_expected = 1662
-    part1_expected = 21
+    part1_expected = 1662
+    #part1_expected = 21
     assert part1_result == part1_expected
 
     part2_result = part2(matrix)
-    part2_expected = 8
+    #part2_expected = 8
+    part2_expected = 537600
     assert part2_result == part2_expected
