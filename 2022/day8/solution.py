@@ -5,7 +5,7 @@ def get_input(filename):
     with open(filename, "r") as f:
         return f.read().split("\n")
 
-def get_matrix(input_values):
+def get_matrix(input_values) -> np.array:
     matrix = []
     for line in input_values:
         # create list of tree heights
@@ -13,22 +13,22 @@ def get_matrix(input_values):
         matrix.append(rows)
     return np.array(matrix)
 
-def is_edge(matrix, row, col):
+def is_edge(matrix, row, col) -> bool:
     # we assume the matrix is NxN
     max = len(matrix)
     if row == 0 or col == 0 or (row == max - 1) or (col == max - 1):
         return True
     return False
 
-def get_trees_lower_than(heights, height):
+def get_trees_lower_than(heights, height) -> list[int]:
     return [h for h in heights if h >= height]
 
-def is_visible(heights, height):
+def is_visible(heights, height) -> bool:
     if len(get_trees_lower_than(heights, height)) == 0:
         return True
     return False
 
-def is_tree_visible_at_pos(matrix, row, col):
+def is_tree_visible_at_pos(matrix, row, col) -> bool:
     if is_edge(matrix, row, col):
         return True
 
@@ -45,7 +45,7 @@ def is_tree_visible_at_pos(matrix, row, col):
             return True
     return False
 
-def record_num_visible_trees(array, height, nums):
+def record_num_visible_trees(array, height, nums) -> None:
     count = 0
     for value in array:
         count += 1
@@ -55,7 +55,7 @@ def record_num_visible_trees(array, height, nums):
     if count > 0:
         nums.append(count)
 
-def get_scenic_score(matrix, row, col):
+def get_scenic_score(matrix, row, col) -> int:
     height = matrix[row][col]
     nums = []
     ranges = [ 
@@ -68,7 +68,7 @@ def get_scenic_score(matrix, row, col):
     # calculate the score by multiplying all numbers
     return np.prod(nums).item()
 
-def part1(matrix):
+def part1(matrix) -> int:
     count = 0
     for i in range(0, len(matrix)):
         for j in range(0, len(matrix)):
@@ -76,7 +76,7 @@ def part1(matrix):
                 count += 1
     return count
 
-def part2(matrix):
+def part2(matrix) -> int:
     max_score = 0
     maxlen = len(matrix)-1
     for i in range(1, maxlen):
