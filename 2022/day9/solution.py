@@ -1,4 +1,5 @@
 from pathlib import Path
+import numpy as np
 
 directions = {
     "R":(1,0),
@@ -7,24 +8,26 @@ directions = {
     "D":(0,1)
 }
 
+grid = np.empty((3,3))
+
 def part2():
     return 0
-
-def is_tail_close(pos):
-    
-    return False
 
 def part1(lines):
     hx = hy = 0
     tx = ty = 0
-    positions = []
+    positions = {}
+
     for line in lines:
         direction = directions[line.split()[0]]
         length = int(line.split()[1])
-        for step in range(1, length):
+        for step in range(1, length+1):
+            positions[(hx,hy)] = False
             hx += direction[0]
             hy += direction[1]
-            
+            # head has a new pos, check tail
+            diff_x = abs(hx - tx)
+            diff_y = abs(hy - ty)
     return 0
 
 def get_input(filename):
