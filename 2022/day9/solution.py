@@ -22,45 +22,39 @@ def part2():
     return 0
 
 def part1(lines):
-    hx = hy = 1
-    tx = ty = 1
-    positions = {}
-    grd = []
+    head_pos = [1, 1]
+    tail_pos = [1, 1]
+    # count initial position
+    tail_positions = {(tail_pos[0], tail_pos[1]):True}
 
     for line in lines:
         direction = line.split()[0]
         direction_vector = directions[direction]
         length = int(line.split()[1])
         for step in range(1, length+1):
-            positions[(hx,hy)] = False
-            hx += direction_vector[0]
-            hy += direction_vector[1]
+            # save previous position
+            prev_pos = [head_pos[0], head_pos[1]]
+            head_pos[0] += direction_vector[0]
+            head_pos[1] += direction_vector[1]
             # head has a new pos, check tail
-            diff_x = abs(hx - tx)
-            diff_y = abs(hy - ty)            
-            if direction == "R" and diff_x > 1:
-                tx += 1
-            elif direction == "L" and diff_x > 1:
-                tx -= 1
-            elif direction == "U" and diff_y > 1:
-                ty -= 1
-            elif direction == "D" and diff_y > 1:
-                ty += 1
+            diff_x = abs(head_pos[0] - tail_pos[0])
+            diff_y = abs(head_pos[1] - tail_pos[1])
 
-            if diff_x > 1 and diff_y > 1:
-                if direction == "U":
-                    diff_x += 1
-                if direction == "D":
-                    diff_x +=
-    return 0
+            if diff_x > 1 or diff_y > 1:
+                tail_pos[0] = prev_pos[0]
+                tail_pos[1] = prev_pos[1]
+                tail_positions[(tail_pos[0], tail_pos[1])] = True
+    
+    return len(tail_positions)
 
 def get_input(filename):
     with open(filename, "r") as f:
         return f.read().split("\n")
 
 if __name__ == "__main__":
-    input_values = get_input("sample_input.txt")
-    print(input_values)
+    input_values = get_input("input.txt")
     
     part1_result = part1(input_values)
     print(part1_result)
+    part1_expected = 5779
+    assert part1_result == part1_expected
