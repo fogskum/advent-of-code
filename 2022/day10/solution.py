@@ -21,9 +21,9 @@ def execute_instructions(instructions):
         else:
             if instruction.split()[0] == "addx":
                 add_cycle(register_value)
+                add_cycle(register_value)
                 value = int(instruction.split()[1])
                 register_value += value
-                add_cycle(register_value)
             
     return sum(signal_strengths)
 
@@ -36,3 +36,4 @@ if __name__ == "__main__":
     part1_result = execute_instructions(instructions)
     print(part1_result)
     #assert part1_result == 13140
+    assert part1_result == 15680
