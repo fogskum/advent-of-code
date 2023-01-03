@@ -1,31 +1,18 @@
 from pathlib import Path
 
-cycles = 0
-signal_strengths = []
-
-def add_cycle(register_value):
-    global cycles 
-    cycles += 1
-    if cycles % 40 == 20:
-        signal_strengths.append( cycles * register_value )
-
 def execute_instructions(instructions):
-    register_value = 1
-
+    # initial register value
+    cycle_values = [1]
     for instruction in instructions:
-        if cycles > 220:
-            break
-
         if instruction == "noop":
-            add_cycle(register_value)
+            cycle_values.append( cycle_values[-1] )
         else:
             if instruction.split()[0] == "addx":
-                add_cycle(register_value)
-                add_cycle(register_value)
-                value = int(instruction.split()[1])
-                register_value += value
+                cycle_values.append( cycle_values[-1] )
+                cycle_values.append( cycle_values[-1] + int(instruction.split()[1]))
             
-    return sum(signal_strengths)
+    signal_strength = sum([i * cycle_values[i-1] for i in range(20, 240, 40)])
+    return cycle_values, signal_strength
 
 def get_instructions(filename):
     with open(filename, "r") as f:
@@ -33,7 +20,7 @@ def get_instructions(filename):
 
 if __name__ == "__main__":
     instructions = get_instructions("input.txt")
-    part1_result = execute_instructions(instructions)
-    print(part1_result)
+    cycle_values, signal_strength = execute_instructions(instructions)
+    print(signal_strength)
     #assert part1_result == 13140
-    assert part1_result == 15680
+    assert signal_strength == 15680
